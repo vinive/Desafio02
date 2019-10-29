@@ -10,9 +10,39 @@ class StudentController {
             return res.status(400).json({ error: 'Student already exists' });
         }
 
-        const student = await Student.create(req.body);
+        const { id, name, email, age, weight, height } = await Student.create(
+            req.body
+        );
 
-        return res.json(student);
+        return res.json({
+            id,
+            name,
+            email,
+            age,
+            weight,
+            height,
+        });
+    }
+
+    async update(req, res) {
+        const { id } = req.params;
+        const { email } = req.body;
+
+        const student = await Student.findByPk(id);
+
+        if (email !== student.email) {
+            const studentExists = await Student.findOne({ where: { email } });
+
+            if (studentExists) {
+                return res
+                    .status(400)
+                    .json({ error: 'Student already exists' });
+            }
+        }
+
+        const { name, age, weight, height } = await student.update(req.body);
+
+        return res.json({ id, name, email, age, weight, height });
     }
 }
 
